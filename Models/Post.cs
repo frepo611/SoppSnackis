@@ -18,8 +18,8 @@ public class Post
     public string? Quote { get; set; }
     public int Likes { get; set; }
 
-    public Subject? Subject { get; set; }
-    public User? Author { get; set; }
+    public Topic? Subject { get; set; }
+    public Areas.Identity.Data.SoppSnackisUser? Author { get; set; }
     public Post? ParentPost { get; set; }
     public ICollection<Post> Replies { get; set; } = new List<Post>();
     public ICollection<Report> Reports { get; set; } = new List<Report>();

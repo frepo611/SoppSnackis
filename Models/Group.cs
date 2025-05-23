@@ -12,7 +12,7 @@ public class Group
     public Guid CreatedByUserId { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-    public User? CreatedByUser { get; set; }
+    public Areas.Identity.Data.SoppSnackisUser? CreatedByUser { get; set; }
     public ICollection<GroupMember> Members { get; set; } = new List<GroupMember>();
     public ICollection<PrivateMessage> Messages { get; set; } = new List<PrivateMessage>();
 }

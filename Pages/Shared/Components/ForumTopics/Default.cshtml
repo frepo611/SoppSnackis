@@ -1,0 +1,13 @@
+﻿@page
+    @model IEnumerable<SoppSnackis.Models.Topic>
+    @{
+    }
+
+@foreach (var topic in Model)
+{
+    <li>
+        <a class="dropdown-item" asp-page="/Topics/Details" asp-route-id="@topic.Id">
+            @topic.Name
+        </a>
+    </li>
+}

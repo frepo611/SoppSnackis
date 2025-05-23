@@ -9,5 +9,5 @@ public class GroupMember
     public bool IsOwner { get; set; }
 
     public Group? Group { get; set; }
-    public User? User { get; set; }
+    public Areas.Identity.Data.SoppSnackisUser? User { get; set; }
 }

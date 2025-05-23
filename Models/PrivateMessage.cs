@@ -16,7 +16,7 @@ public class PrivateMessage
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public bool IsGroupMessage { get; set; }
 
-    public User? Sender { get; set; }
-    public User? Receiver { get; set; }
+    public Areas.Identity.Data.SoppSnackisUser? Sender { get; set; }
+    public Areas.Identity.Data.SoppSnackisUser? Receiver { get; set; }
     public Group? Group { get; set; }
 }

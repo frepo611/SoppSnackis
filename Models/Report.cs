@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-
 namespace SoppSnackis.Models;
 
 public class Report
@@ -16,5 +15,5 @@ public class Report
     public string? Comment { get; set; }
 
     public Post? Post { get; set; }
-    public User? ReportedByUser { get; set; }
+    public Areas.Identity.Data.SoppSnackisUser? ReportedByUser { get; set; }
 }
