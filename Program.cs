@@ -1,7 +1,7 @@
 
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
 using SoppSnackis.Data;
+using SoppSnackis.Areas.Identity.Data;
 
 namespace SoppSnackis;
 
@@ -15,10 +15,13 @@ public class Program
         builder.Services.AddRazorPages();
 
         // Register your DbContext with the DI container
-        builder.Services.AddDbContext<Data.ForumDbContext>(options =>
+        builder.Services.AddDbContext<ForumDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("LocalConnection")));
 
-        builder.Services.AddDefaultIdentity<SoppSnackisUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<SoppSnackisContext>();
+        builder.Services.AddDbContext<SoppSnackisIdentityDbContext>(options =>
+            options.UseSqlServer(builder.Configuration.GetConnectionString("LocalConnection")));
+
+        builder.Services.AddDefaultIdentity<SoppSnackisUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<SoppSnackisIdentityDbContext>();
 
         var app = builder.Build();
 
@@ -36,6 +39,7 @@ public class Program
         app.UseRouting();
 
         app.UseAuthorization();
+        app.UseAuthentication();
 
         app.MapRazorPages();
 

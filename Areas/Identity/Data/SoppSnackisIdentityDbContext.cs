@@ -1,13 +1,11 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using SoppSnackis.Areas.Identity.Data;
 
-namespace SoppSnackis.Data;
+namespace SoppSnackis.Areas.Identity.Data;
 
-public class SoppSnackisContext : IdentityDbContext<SoppSnackisUser>
+public class SoppSnackisIdentityDbContext : IdentityDbContext<SoppSnackisUser>
 {
-    public SoppSnackisContext(DbContextOptions<SoppSnackisContext> options)
+    public SoppSnackisIdentityDbContext(DbContextOptions<SoppSnackisIdentityDbContext> options)
         : base(options)
     {
     }
