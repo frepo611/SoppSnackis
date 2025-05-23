@@ -1,0 +1,48 @@
+﻿@page
+@model SoppSnackis.Pages.Admin.TopicsModel
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "admin")]
+
+<h2>Ämneshantering</h2>
+
+@if (Model.ErrorMessage != null)
+{
+    <div class="alert alert-danger">@Model.ErrorMessage</div>
+}
+
+@if (Model.Topics != null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Namn</th>
+                <th>Skapad av</th>
+                <th>Skapad</th>
+                <th>Åtgärder</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var topic in Model.Topics)
+            {
+                <tr>
+                    <td>@topic.Name</td>
+                    <td>@topic.CreatedByUser.UserName</td>
+                    <td>@topic.CreatedAt.ToString("yyyy-MM-dd")</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" asp-page-handler="Delete" asp-route-id="@topic.Id">Ta bort</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<h3>Lägg till nytt ämne</h3>
+<form method="post" asp-page-handler="Create">
+    <div class="mb-3">
+        <input asp-for="NewTopicName" class="form-control" placeholder="Ämnesnamn" />
+        <span asp-validation-for="NewTopicName" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Lägg till ämne</button>
+</form>
+

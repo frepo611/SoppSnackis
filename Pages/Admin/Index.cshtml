@@ -1,0 +1,14 @@
+﻿@page
+@model SoppSnackis.Pages.Admin.IndexModel
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "admin")]
+
+<h1>Adminpanel</h1>
+<ul>
+    <li><a asp-page="Users">Användarhantering</a></li>
+    <li><a asp-page="Reports">Rapporthantering</a></li>
+    <li><a asp-page="Topics">Ämneshantering</a></li>
+    <li><a asp-page="Groups">Grupphantering</a></li>
+</ul>
+
+

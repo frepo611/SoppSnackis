@@ -1,0 +1,47 @@
+@page
+@model SoppSnackis.Pages.Admin.UsersModel
+@using SoppSnackis.Areas.Identity.Data
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Authorization
+
+@attribute [Authorize(Roles = "admin")]
+
+<h1>Användarhantering</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Email</th>
+            <th>Roller</th>
+            <th>Registrerad</th>
+            <th>Åtgärder</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var user in Model.Users)
+    {
+        <tr>
+            <td>@user.Email</td>
+            <td>@string.Join(", ", user.Roles)</td>
+            <td>@user.CreatedAt.ToString("yyyy-MM-dd")</td>
+            <td>
+                @if (!user.Roles.Contains("admin"))
+                {
+                    <form method="post" asp-page-handler="Promote" asp-route-id="@user.Id" style="display:inline">
+                        <button type="submit" class="btn btn-sm btn-success">Gör till admin</button>
+                    </form>
+                }
+                @if (user.Roles.Contains("admin") && user.Email != User.Identity.Name)
+                {
+                    <form method="post" asp-page-handler="Demote" asp-route-id="@user.Id" style="display:inline">
+                        <button type="submit" class="btn btn-sm btn-warning">Ta bort admin</button>
+                    </form>
+                }
+                <form method="post" asp-page-handler="Delete" asp-route-id="@user.Id" style="display:inline" onsubmit="return confirm('Är du säker på att du vill ta bort denna användare?');">
+                    <button type="submit" class="btn btn-sm btn-danger">Ta bort</button>
+                </form>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

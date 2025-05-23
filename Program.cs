@@ -18,14 +18,23 @@ public class Program
             options.UseSqlServer(builder.Configuration.GetConnectionString("LocalConnection")));
 
         builder.Services.AddDefaultIdentity<SoppSnackisUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            .AddRoles<IdentityRole<Guid>>()
             .AddEntityFrameworkStores<SoppSnackisIdentityDbContext>();
 
         var app = builder.Build();
 
-        // Seed the Identity database with a default user
+        // Seed the Identity database with a default user and admin role
         using (var scope = app.Services.CreateScope())
         {
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<SoppSnackisUser>>();
+            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+
+            // Ensure the "admin" role exists
+            var adminRoleName = "admin";
+            if (!await roleManager.RoleExistsAsync(adminRoleName))
+            {
+                await roleManager.CreateAsync(new IdentityRole<Guid>(adminRoleName));
+            }
             var adminEmail = "admin@example.com";
             var adminUser = await userManager.FindByEmailAsync(adminEmail);
             if (adminUser is null)
@@ -38,7 +47,11 @@ public class Program
                 };
 
                 var result = await userManager.CreateAsync(adminUser, "Admin123!");
-                // Optional: Check result.Succeeded if you need to take further action on failure.
+            }
+            // Add user to "admin" role if not already in it
+            if (!await userManager.IsInRoleAsync(adminUser, adminRoleName))
+            {
+                await userManager.AddToRoleAsync(adminUser, adminRoleName);
             }
         }
 

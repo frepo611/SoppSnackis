@@ -1,0 +1,45 @@
+@page
+@model SoppSnackis.Pages.Admin.ReportsModel
+@using SoppSnackis.Models
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "admin")]
+
+<h1>Rapporthantering</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Inlägg</th>
+            <th>Rapporterad av</th>
+            <th>Datum</th>
+            <th>Status</th>
+            <th>Kommentar</th>
+            <th>Åtgärder</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var report in Model.Reports)
+    {
+        <tr>
+            <td>
+                <a asp-page="/Posts/Details" asp-route-id="@report.PostId">Visa inlägg</a>
+            </td>
+            <td>@report.ReportedByUserEmail</td>
+            <td>@report.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+            <td>@report.Status</td>
+            <td>@report.Comment</td>
+            <td>
+                @if (report.Status != "Avslutad")
+                {
+                    <form method="post" asp-page-handler="Resolve" asp-route-id="@report.Id" style="display:inline">
+                        <button type="submit" class="btn btn-sm btn-success">Markera som hanterad</button>
+                    </form>
+                }
+                <form method="post" asp-page-handler="DeletePost" asp-route-id="@report.PostId" style="display:inline" onsubmit="return confirm('Ta bort inlägget?');">
+                    <button type="submit" class="btn btn-sm btn-danger">Ta bort inlägg</button>
+                </form>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
