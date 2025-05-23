@@ -1,5 +1,7 @@
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using SoppSnackis.Data;
 
 namespace SoppSnackis;
 
@@ -15,6 +17,8 @@ public class Program
         // Register your DbContext with the DI container
         builder.Services.AddDbContext<Data.ForumDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("LocalConnection")));
+
+        builder.Services.AddDefaultIdentity<SoppSnackisUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<SoppSnackisContext>();
 
         var app = builder.Build();
 
