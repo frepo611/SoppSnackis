@@ -1,0 +1,21 @@
+@page
+@model SoppSnackis.Pages.Admin.ApiStatusModel
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "admin")]
+
+<h2>API-status</h2>
+
+@if (Model.ErrorMessage != null)
+{
+    <div class="alert alert-danger">@Model.ErrorMessage</div>
+}
+else if (Model.Status != null)
+{
+    <div class="alert alert-success">
+        <strong>Status:</strong> @Model.Status
+    </div>
+}
+else
+{
+    <div>Laddar status...</div>
+}

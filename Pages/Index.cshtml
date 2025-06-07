@@ -1,10 +1,28 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "SoppSnackisForum";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4 mb-4">Ämnen</h1>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <ul class="list-group">
+                @foreach (var topic in Model.Topics)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <a asp-page="/Topics/Details" asp-route-id="@topic.Id" class="fw-bold text-decoration-none text-primary">
+                                @topic.Name
+                            </a>
+                        </div>
+                        <span class="badge bg-secondary rounded-pill">
+                            Skapad: @topic.CreatedAt.ToString("yyyy-MM-dd")
+                        </span>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
 </div>

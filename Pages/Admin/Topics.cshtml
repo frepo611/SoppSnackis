@@ -26,10 +26,12 @@
             {
                 <tr>
                     <td>@topic.Name</td>
-                    <td>@topic.CreatedByUser.UserName</td>
+                    <td>@topic.CreatedByUserId</td>
                     <td>@topic.CreatedAt.ToString("yyyy-MM-dd")</td>
                     <td>
-                        <button class="btn btn-danger btn-sm" asp-page-handler="Delete" asp-route-id="@topic.Id">Ta bort</button>
+                        <form method="post" asp-page-handler="Delete" asp-route-id="@topic.Id" style="display:inline">
+                            <button type="submit" class="btn btn-danger btn-sm">Ta bort</button>
+                        </form>
                     </td>
                 </tr>
             }
@@ -40,8 +42,8 @@
 <h3>Lägg till nytt ämne</h3>
 <form method="post" asp-page-handler="Create">
     <div class="mb-3">
-        <input asp-for="NewTopicName" class="form-control" placeholder="Ämnesnamn" />
-        <span asp-validation-for="NewTopicName" class="text-danger"></span>
+        <input asp-for="NewTopic.Name" class="form-control" placeholder="Ämnesnamn" />
+        <span asp-validation-for="NewTopic.Name" class="text-danger"></span>
     </div>
     <button type="submit" class="btn btn-primary">Lägg till ämne</button>
 </form>

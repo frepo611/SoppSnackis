@@ -1,20 +1,21 @@
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
+using SoppSnackis.Areas.Identity.Data;
+using SoppSnackis.Models;
 
-namespace SoppSnackis.Pages
+public class IndexModel : PageModel
 {
-    public class IndexModel : PageModel
+    private readonly SoppSnackisIdentityDbContext _context;
+
+    public List<Topic> Topics { get; set; } = new();
+
+    public IndexModel(SoppSnackisIdentityDbContext context)
     {
-        private readonly ILogger<IndexModel> _logger;
+        _context = context;
+    }
 
-        public IndexModel(ILogger<IndexModel> logger)
-        {
-            _logger = logger;
-        }
-
-        public void OnGet()
-        {
-
-        }
+    public async Task OnGetAsync()
+    {
+        Topics = await _context.Topics.OrderBy(t => t.Name).ToListAsync();
     }
 }

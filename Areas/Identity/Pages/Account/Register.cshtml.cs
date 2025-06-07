@@ -98,6 +98,9 @@ namespace SoppSnackis.Areas.Identity.Pages.Account
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
+
+            [Display(Name = "Registrera som admin")]
+            public bool IsAdmin { get; set; }
         }
 
 
@@ -122,6 +125,20 @@ namespace SoppSnackis.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
+
+                    // Assign default "user" role
+                    await _userManager.AddToRoleAsync(user, "user");
+
+                    if (Input.IsAdmin)
+                    {
+                        // Ensure the admin role exists
+                        var roleManager = HttpContext.RequestServices.GetService<RoleManager<IdentityRole<Guid>>>();
+                        if (roleManager != null && !await roleManager.RoleExistsAsync("admin"))
+                        {
+                            await roleManager.CreateAsync(new IdentityRole<Guid>("admin"));
+                        }
+                        await _userManager.AddToRoleAsync(user, "admin");
+                    }
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);

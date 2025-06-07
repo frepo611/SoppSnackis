@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using SoppSnackis.Models;
+using SoppSnackis.DTOs;
 using System.ComponentModel.DataAnnotations;
 
 namespace SoppSnackis.Pages.Admin;
@@ -12,17 +13,23 @@ public class TopicsModel : PageModel
     [BindProperty]
     [Required(ErrorMessage = "Ämnesnamn är obligatoriskt.")]
     [Display(Name = "Ämnesnamn")]
-    public string NewTopicName { get; set; } = string.Empty;
+    public TopicDTO NewTopic { get; set; } = new();
 
-    public List<Topic>? Topics { get; set; }
+    public List<TopicDTO>? Topics { get; set; }
     public string? ErrorMessage { get; set; }
+
+    private readonly Services.IApiService _apiService;
+
+    public TopicsModel(Services.IApiService apiService)
+    {
+        _apiService = apiService;
+    }
 
     public async Task OnGetAsync()
     {
         try
         {
-            // TODO: Anropa API för att hämta ämnen
-            Topics = new List<Topic>(); // Ersätt med API-anrop
+            Topics = await _apiService.GetTopicsAsync();
         }
         catch
         {
@@ -40,8 +47,19 @@ public class TopicsModel : PageModel
 
         try
         {
-            // TODO: Anropa API för att skapa ämne
-            // Exempel: await _apiService.CreateTopicAsync(NewTopicName);
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (userId != null && Guid.TryParse(userId, out var guid))
+            {
+                NewTopic.CreatedByUserId = guid;
+                NewTopic.CreatedAt = DateTime.Now;
+            }
+            else
+            {
+                ErrorMessage = "Kunde inte identifiera användare.";
+                await OnGetAsync();
+                return Page();
+            }
+            await _apiService.CreateTopicAsync(NewTopic);
             return RedirectToPage();
         }
         catch
@@ -56,8 +74,7 @@ public class TopicsModel : PageModel
     {
         try
         {
-            // TODO: Anropa API för att ta bort ämne
-            // Exempel: await _apiService.DeleteTopicAsync(id);
+            await _apiService.DeleteTopicAsync(id);
             return RedirectToPage();
         }
         catch

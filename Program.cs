@@ -21,6 +21,15 @@ public class Program
             .AddRoles<IdentityRole<Guid>>()
             .AddEntityFrameworkStores<SoppSnackisIdentityDbContext>();
 
+        // Add this to register an HttpClient for your API
+        builder.Services.AddHttpClient("SoppSnackisAPI", client =>
+        {   
+            var baseAddress = builder.Configuration.GetValue<string>("SoppSnackisAPI:BaseAddress");
+            client.BaseAddress = new Uri(baseAddress!);
+        });
+
+        builder.Services.AddScoped<Services.IApiService, Services.ApiService>();
+
         var app = builder.Build();
 
         // Seed the Identity database with a default user and admin role
@@ -35,25 +44,13 @@ public class Program
             {
                 await roleManager.CreateAsync(new IdentityRole<Guid>(adminRoleName));
             }
-            var adminEmail = "admin@example.com";
-            var adminUser = await userManager.FindByEmailAsync(adminEmail);
-            if (adminUser is null)
+            // Ensure the "user" role exists
+            var userRoleName = "user";
+            if (!await roleManager.RoleExistsAsync(userRoleName))
             {
-                adminUser = new SoppSnackisUser
-                {
-                    UserName = "admin",
-                    Email = adminEmail,
-                    EmailConfirmed = true
-                };
-
-                var result = await userManager.CreateAsync(adminUser, "Admin123!");
+                await roleManager.CreateAsync(new IdentityRole<Guid>(userRoleName));
             }
-            // Add user to "admin" role if not already in it
-            if (!await userManager.IsInRoleAsync(adminUser, adminRoleName))
-            {
-                await userManager.AddToRoleAsync(adminUser, adminRoleName);
-            }
-        }
+      }
 
         // Configure the HTTP request pipeline.
         if (!app.Environment.IsDevelopment())
