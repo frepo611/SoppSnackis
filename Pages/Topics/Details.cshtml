@@ -1,0 +1,43 @@
+@page "{id:int}"
+@model DetailsModel
+@{
+    ViewData["Title"] = Model.Topic?.Name ?? "Ämne";
+}
+
+<h2>@Model.Topic?.Name</h2>
+<p>Skapad: @Model.Topic?.CreatedAt.ToString("yyyy-MM-dd")</p>
+
+@if (Model.Posts.Any())
+{
+    <ul class="list-group">
+        @foreach (var post in Model.Posts.Where(p => p.ParentPostId == null))
+        {
+            <li class="list-group-item">
+                <div>
+                    <strong>@post.Author?.UserName</strong> skrev:
+                    <span class="text-muted">@post.CreatedAt.ToString("yyyy-MM-dd HH:mm")</span>
+                </div>
+                <div>@post.Text</div>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p>Inga inlägg i detta ämne ännu.</p>
+}
+
+<hr />
+
+<h4>Skriv ett nytt inlägg</h4>
+<form method="post">
+    <div class="mb-3">
+        <textarea asp-for="NewPostText" class="form-control" rows="4" placeholder="Skriv ditt inlägg här..."></textarea>
+        <span asp-validation-for="NewPostText" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Skicka inlägg</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
