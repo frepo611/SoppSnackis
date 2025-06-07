@@ -18,7 +18,8 @@ public class DetailsModel : PageModel
         _context = context;
         _userManager = userManager;
     }
-
+    [BindProperty]
+    public Post NewReply { get; set; } = new();
     public Topic? Topic { get; set; }
     public List<Post> Posts { get; set; } = new();
 
@@ -41,10 +42,34 @@ public class DetailsModel : PageModel
         Posts = await _context.Posts
             .Where(p => p.SubjectId == id)
             .Include(p => p.Author)
+            .Include(p => p.Replies)
+                .ThenInclude(r => r.Author)
             .OrderBy(p => p.CreatedAt)
             .ToListAsync();
 
         return Page();
+    }
+    public async Task<IActionResult> OnPostReplyAsync(int parentId)
+    {
+        var parentPost = await _context.Posts.FindAsync(parentId);
+        if (parentPost == null)
+            return NotFound();
+
+        var user = await _userManager.GetUserAsync(User);
+
+        var reply = new Post
+        {
+            Text = NewReply.Text,
+            AuthorId = user.Id,
+            CreatedAt = DateTime.UtcNow,
+            ParentPostId = parentId,
+            SubjectId = parentPost.SubjectId
+        };
+
+        _context.Posts.Add(reply);
+        await _context.SaveChangesAsync();
+
+        return RedirectToPage(new { id = parentPost.SubjectId });
     }
 
     public async Task<IActionResult> OnPostAsync(int id)

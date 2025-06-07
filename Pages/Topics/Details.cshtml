@@ -18,6 +18,16 @@
                     <span class="text-muted">@post.CreatedAt.ToString("yyyy-MM-dd HH:mm")</span>
                 </div>
                 <div>@post.Text</div>
+                <!-- Reply form for this top-level post -->
+                <form method="post" asp-page-handler="Reply" asp-route-parentId="@post.Id" class="mt-2">
+                    <div class="mb-2">
+                        <textarea name="NewReply.Text" class="form-control" rows="2" placeholder="Svara på detta inlägg..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-secondary">Reply</button>
+                </form>
+
+                <!-- Show nested replies -->
+                @await Html.PartialAsync("_RepliesPartial", post.Replies)
             </li>
         }
     </ul>
