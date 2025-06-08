@@ -1,0 +1,42 @@
+﻿@page "{id:int}"
+@model SoppSnackis.Pages.Posts.DetailsModel
+@{
+    ViewData["Title"] = "Inläggsdetaljer";
+}
+
+@if (Model.Post == null)
+{
+    <div class="alert alert-danger">Inlägget hittades inte.</div>
+}
+else
+{
+    <div class="card">
+        <div class="card-header">
+            <strong>
+                <a asp-page="/Users/Details" asp-route-id="@Model.Post.AuthorId">
+                    @Model.Post.Author?.UserName
+                </a>
+            </strong>
+            <span class="text-muted small ms-2">
+                @Model.Post.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
+            </span>
+        </div>
+        <div class="card-body">
+            @if (Model.CanEdit)
+            {
+                <form method="post" asp-page-handler="Edit" asp-page-route-id="@Model.Post.Id">
+                    <div class="mb-2">
+                        <textarea class="form-control" asp-for="EditText" rows="3"></textarea>
+
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm">Spara ändringar</button>
+                </form>
+            }
+            else
+            {
+            <p>@Model.Post.Text</p>
+                
+            }
+        </div>
+    </div>
+}

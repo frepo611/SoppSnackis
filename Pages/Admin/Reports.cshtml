@@ -35,9 +35,6 @@
                         <button type="submit" class="btn btn-sm btn-success">Markera som hanterad</button>
                     </form>
                 }
-                <form method="post" asp-page-handler="DeletePost" asp-route-id="@report.PostId" style="display:inline" onsubmit="return confirm('Ta bort inlägget?');">
-                    <button type="submit" class="btn btn-sm btn-danger">Ta bort inlägg</button>
-                </form>
             </td>
         </tr>
     }
