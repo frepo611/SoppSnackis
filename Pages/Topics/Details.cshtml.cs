@@ -31,10 +31,11 @@ public class DetailsModel : PageModel
     [BindProperty]
     [Required(ErrorMessage = "Inläggstext är obligatorisk.")]
     [Display(Name = "Inlägg")]
-    public string NewPostText { get; set; } = string.Empty; [BindProperty]
-    [Required(ErrorMessage = "Inläggstext är obligatorisk.")]
+    public string NewPostText { get; set; }
+    [BindProperty]
+    [Required(ErrorMessage = " Svarstext är obligatorisk.")]
     [Display(Name = "Svar")]
-    public string NewReplyText { get; set; } = string.Empty;
+    public string NewReplyText { get; set; }
 
     public async Task<IActionResult> OnGetAsync(int id)
     {
@@ -78,9 +79,15 @@ public class DetailsModel : PageModel
         }
     }
 
-    public async Task<IActionResult> OnPostReplyAsync(int parentId, [Bind("Text")] Post newReply)
+    public async Task<IActionResult> OnPostReplyAsync(int parentId)
     {
-       
+        ModelState.Remove(nameof(NewPostText)); // Ignore new post validation
+        if (!ModelState.IsValid)
+        {
+            await OnGetAsync(parentId); // or topic id
+            return Page();
+        }
+
         var parentPost = await _context.Posts.FindAsync(parentId);
         if (parentPost == null)
             return NotFound();
@@ -104,6 +111,7 @@ public class DetailsModel : PageModel
 
     public async Task<IActionResult> OnPostAsync(int id)
     {
+        ModelState.Remove(nameof(NewReplyText)); // Ignore reply validation
         if (!ModelState.IsValid)
         {
             await OnGetAsync(id);

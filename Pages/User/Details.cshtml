@@ -1,0 +1,24 @@
+﻿@page "{id:guid}"
+@model SoppSnackis.Pages.User.DetailsModel
+@{
+}
+
+<h2>Användarprofil</h2>
+
+@if (Model.UserDetails != null)
+{
+    <div>
+        <strong>Användarnamn:</strong> @Model.UserDetails.UserName <br />
+        <strong>Email:</strong> @Model.UserDetails.Email <br />
+        <strong>Info:</strong> @Model.UserDetails.InfoText <br />
+        <strong>Skapad:</strong> @Model.UserDetails.CreatedAt.ToString("yyyy-MM-dd") <br />
+        @if (!string.IsNullOrEmpty(Model.UserDetails.ProfileImagePath))
+        {
+            <img src="@Model.UserDetails.ProfileImagePath" alt="Profilbild" style="max-width:150px;" />
+        }
+    </div>
+}
+else
+{
+    <p>Användaren hittades inte.</p>
+}

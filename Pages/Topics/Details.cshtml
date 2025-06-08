@@ -24,7 +24,11 @@
     {
         <li class="list-group-item" style="margin-left:@(item.Level * 2)rem;">
             <div>
-                <strong>@item.Post?.Author?.UserName</strong>
+                <strong>
+                    <a asp-page="/Users/Details" asp-route-id="@item.Post?.Author?.Id">
+                        @item.Post?.Author?.UserName
+                    </a>
+                </strong>
                 <span class="text-muted small">@item.Post?.CreatedAt.ToString("yyyy-MM-dd HH:mm")</span>
             </div>
             <div>@item.Post?.Text</div>
@@ -37,7 +41,7 @@
             <form id="reply-form-@item.Post?.Id" method="post" asp-page-handler="Reply" asp-route-parentId="@item.Post?.Id"
                   class="mt-2" style="display:none;">
                 <div class="mb-2">
-                    <textarea name="NewReply.Text" class="form-control" rows="2" placeholder="Svara på detta inlägg..."></textarea>
+                    <textarea name="NewReplyText" class="form-control" rows="2" placeholder="Svara på detta inlägg..."></textarea>
                 </div>
                 <button type="submit" class="btn btn-sm btn-secondary">Svara</button>
             </form>
