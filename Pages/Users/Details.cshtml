@@ -1,22 +1,48 @@
 ﻿@page "{id:guid}"
 @model SoppSnackis.Pages.User.DetailsModel
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<SoppSnackis.Areas.Identity.Data.SoppSnackisUser> UserManager
 @{
+    var isOwner = UserManager.GetUserId(User) == Model.UserDetails?.Id.ToString();
+    var isAdmin = User.IsInRole("admin");
+    var canEdit = isOwner || isAdmin;
 }
 
 <h2>Användarprofil</h2>
 
 @if (Model.UserDetails != null)
 {
-    <div>
-        <strong>Användarnamn:</strong> @Model.UserDetails.UserName <br />
-        <strong>Email:</strong> @Model.UserDetails.Email <br />
-        <strong>Info:</strong> @Model.UserDetails.InfoText <br />
-        <strong>Skapad:</strong> @Model.UserDetails.CreatedAt.ToString("yyyy-MM-dd") <br />
-        @if (!string.IsNullOrEmpty(Model.UserDetails.ProfileImagePath))
+    <form method="post" enctype="multipart/form-data">
+        <div>
+            <strong>Användarnamn:</strong> @Model.UserDetails.UserName <br />
+            <strong>Email:</strong> @Model.UserDetails.Email <br />
+            <strong>Info:</strong>
+            @if (canEdit)
+            {
+                <textarea asp-for="InfoText" class="form-control"></textarea>
+            }
+            else
+            {
+                @Model.UserDetails.InfoText
+            }
+            <br />
+            <strong>Skapad:</strong> @Model.UserDetails.CreatedAt.ToString("yyyy-MM-dd") <br />
+            @if (!string.IsNullOrEmpty(Model.UserDetails.ProfileImagePath))
+            {
+                <img src="@Model.UserDetails.ProfileImagePath" alt="Profilbild" style="max-width:150px;" />
+            }
+        </div>
+        @if (canEdit)
         {
-            <img src="@Model.UserDetails.ProfileImagePath" alt="Profilbild" style="max-width:150px;" />
+            <div class="mb-2 mt-2">
+                <label for="ProfileImage"><strong>Ladda upp ny profilbild:</strong></label>
+                <input type="file" name="ProfileImage" id="ProfileImage" class="form-control" accept="image/*" />
+            </div>
+            <div class="mt-3">
+                <button type="submit" class="btn btn-primary">Spara ändringar</button>
+            </div>
         }
-    </div>
+    </form>
 }
 else
 {
