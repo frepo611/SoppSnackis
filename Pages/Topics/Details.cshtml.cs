@@ -6,6 +6,7 @@ using SoppSnackis.Areas.Identity.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
+using NanoidDotNet;
 
 [Authorize(Roles = "user")]
 public class DetailsModel : PageModel
@@ -33,6 +34,9 @@ public class DetailsModel : PageModel
     [Required(ErrorMessage = " Svarstext är obligatorisk.")]
     [Display(Name = "Svar")]
     public string NewReplyText { get; set; }
+
+    [BindProperty]
+    public IFormFile NewPostImage { get; set; }
 
     public DetailsModel(SoppSnackisIdentityDbContext context, UserManager<SoppSnackisUser> userManager)
     {
@@ -86,6 +90,7 @@ public class DetailsModel : PageModel
     public async Task<IActionResult> OnPostReplyAsync(int parentId)
     {
         ModelState.Remove(nameof(NewPostText)); // Ignore new post validation
+        ModelState.Remove(nameof(NewPostImage)); // Ignore new image validation
         if (!ModelState.IsValid)
         {
             await OnGetAsync(parentId); // or topic id
@@ -116,6 +121,7 @@ public class DetailsModel : PageModel
     public async Task<IActionResult> OnPostAsync(int id)
     {
         ModelState.Remove(nameof(NewReplyText)); // Ignore reply validation
+        ModelState.Remove(nameof(NewPostImage)); // Ignore image validation
         if (!ModelState.IsValid)
         {
             await OnGetAsync(id);
@@ -128,12 +134,31 @@ public class DetailsModel : PageModel
             return Forbid();
         }
 
+        string? imagePath = null;
+        if (NewPostImage != null && NewPostImage.Length > 0)
+        {
+            var directory = Path.Combine("wwwroot/images/posts");
+            if (!Directory.Exists(directory))
+                Directory.CreateDirectory(directory);
+
+            var fileName = $"{Nanoid.Generate()}{Path.GetExtension(NewPostImage.FileName)}";
+            var filePath = Path.Combine(directory, fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await NewPostImage.CopyToAsync(stream);
+            }
+
+            imagePath = $"/images/posts/{fileName}";
+        }
+
         var post = new Post
         {
             SubjectId = id,
             AuthorId = user.Id,
             Text = NewPostText,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            ImagePath = imagePath
         };
 
         _context.Posts.Add(post);

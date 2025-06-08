@@ -15,10 +15,14 @@
 <p>Skapad: @Model.Topic?.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd")</p>
 
 <h4>Skriv ett nytt inlägg</h4>
-<form method="post">
+<form method="post" enctype="multipart/form-data">
     <div class="mb-3">
         <textarea asp-for="NewPostText" class="form-control" rows="4" placeholder="Skriv ditt inlägg här..."></textarea>
         <span asp-validation-for="NewPostText" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label for="NewPostImage" class="form-label">Ladda upp bild (valfritt):</label>
+        <input type="file" name="NewPostImage" id="NewPostImage" class="form-control" accept="image/*" />
     </div>
     <button type="submit" class="btn btn-primary">Posta inlägg</button>
 </form>
@@ -48,9 +52,18 @@
                     </strong>
                     <span class="text-muted small">@item.Post?.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</span>
                 </div>
-                <div>@item.Post?.Text</div>
+                <div>@item.Post?.Text
+                @if (!string.IsNullOrEmpty(item.Post?.ImagePath))
+                {
+                    <div class="mt-2">
+                        <img src="@item.Post.ImagePath" alt="Inläggsbild" style="max-width: 300px; max-height: 300px;" />
+                    </div>
+                }
+                </div>
 
-                <!-- Reply button and hidden reply form -->
+                <!-- Reply button and hidden reply form for top level posts-->
+                @if (item.Level == 0)
+                {
                 <button type="button" class="btn btn-sm btn-secondary mt-2"
                         onclick="document.getElementById('reply-form-@item.Post?.Id').style.display='block'; this.style.display='none';">
                     Svara
@@ -62,9 +75,11 @@
                     </div>
                     <button type="submit" class="btn btn-sm btn-secondary">Svara</button>
                 </form>
+                }
             </div>
-            <div class="ms-auto d-flex align-items-start">
+
                 <!-- Report button triggers modal -->
+            <div class="ms-auto d-flex align-items-start">
                 <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#reportModal-@item.Post?.Id">
                     Rapportera
                 </button>
