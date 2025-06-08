@@ -11,7 +11,7 @@ public class Post
     public int? ParentPostId { get; set; } // For tree structure
 
     [Required]
-    public string Text { get; set; } = null!;
+    public string Text { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public string? ImagePath { get; set; }

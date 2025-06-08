@@ -10,6 +10,11 @@ using System.ComponentModel.DataAnnotations;
 [Authorize(Roles = "user")]
 public class DetailsModel : PageModel
 {
+    public class PostWithLevel
+    {
+        public Post? Post { get; set; }
+        public int Level { get; set; }
+    }
     private readonly SoppSnackisIdentityDbContext _context;
     private readonly UserManager<SoppSnackisUser> _userManager;
 
@@ -18,15 +23,18 @@ public class DetailsModel : PageModel
         _context = context;
         _userManager = userManager;
     }
-    [BindProperty]
     public Post NewReply { get; set; } = new();
     public Topic? Topic { get; set; }
     public List<Post> Posts { get; set; } = new();
+    public List<PostWithLevel> PostsWithLevel { get; set; } = new();
 
     [BindProperty]
     [Required(ErrorMessage = "Inläggstext är obligatorisk.")]
     [Display(Name = "Inlägg")]
-    public string NewPostText { get; set; } = string.Empty;
+    public string NewPostText { get; set; } = string.Empty; [BindProperty]
+    [Required(ErrorMessage = "Inläggstext är obligatorisk.")]
+    [Display(Name = "Svar")]
+    public string NewReplyText { get; set; } = string.Empty;
 
     public async Task<IActionResult> OnGetAsync(int id)
     {
@@ -47,10 +55,32 @@ public class DetailsModel : PageModel
             .OrderBy(p => p.CreatedAt)
             .ToListAsync();
 
+        PostsWithLevel = FlattenPostsWithLevel(Posts.Where(p => p.ParentPostId == null), Posts, 0).ToList();
+
         return Page();
     }
-    public async Task<IActionResult> OnPostReplyAsync(int parentId)
+
+    private IEnumerable<PostWithLevel> FlattenPostsWithLevel(IEnumerable<Post> posts, List<Post> allPosts, int level)
     {
+        // For level 0, order by newest first; for replies, order by oldest first
+        var orderedPosts = (level == 0)
+            ? posts.OrderByDescending(p => p.CreatedAt)
+            : posts.OrderBy(p => p.CreatedAt);
+
+        foreach (var post in orderedPosts)
+        {
+            yield return new PostWithLevel { Post = post, Level = level };
+            var replies = allPosts.Where(p => p.ParentPostId == post.Id);
+            foreach (var reply in FlattenPostsWithLevel(replies, allPosts, level + 1))
+            {
+                yield return reply;
+            }
+        }
+    }
+
+    public async Task<IActionResult> OnPostReplyAsync(int parentId, [Bind("Text")] Post newReply)
+    {
+       
         var parentPost = await _context.Posts.FindAsync(parentId);
         if (parentPost == null)
             return NotFound();
@@ -59,7 +89,7 @@ public class DetailsModel : PageModel
 
         var reply = new Post
         {
-            Text = NewReply.Text,
+            Text = NewReplyText,
             AuthorId = user.Id,
             CreatedAt = DateTime.UtcNow,
             ParentPostId = parentId,

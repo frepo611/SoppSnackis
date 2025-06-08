@@ -7,46 +7,49 @@
 <h2>@Model.Topic?.Name</h2>
 <p>Skapad: @Model.Topic?.CreatedAt.ToString("yyyy-MM-dd")</p>
 
-@if (Model.Posts.Any())
-{
-    <ul class="list-group">
-        @foreach (var post in Model.Posts.Where(p => p.ParentPostId == null))
-        {
-            <li class="list-group-item">
-                <div>
-                    <strong>@post.Author?.UserName</strong> skrev:
-                    <span class="text-muted">@post.CreatedAt.ToString("yyyy-MM-dd HH:mm")</span>
-                </div>
-                <div>@post.Text</div>
-                <!-- Reply form for this top-level post -->
-                <form method="post" asp-page-handler="Reply" asp-route-parentId="@post.Id" class="mt-2">
-                    <div class="mb-2">
-                        <textarea name="NewReply.Text" class="form-control" rows="2" placeholder="Svara på detta inlägg..."></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-sm btn-secondary">Reply</button>
-                </form>
-
-                <!-- Show nested replies -->
-                @await Html.PartialAsync("_RepliesPartial", post.Replies)
-            </li>
-        }
-    </ul>
-}
-else
-{
-    <p>Inga inlägg i detta ämne ännu.</p>
-}
-
-<hr />
-
 <h4>Skriv ett nytt inlägg</h4>
 <form method="post">
     <div class="mb-3">
         <textarea asp-for="NewPostText" class="form-control" rows="4" placeholder="Skriv ditt inlägg här..."></textarea>
         <span asp-validation-for="NewPostText" class="text-danger"></span>
     </div>
-    <button type="submit" class="btn btn-primary">Skicka inlägg</button>
+    <button type="submit" class="btn btn-primary">Posta inlägg</button>
 </form>
+
+<hr />
+
+@if (Model.PostsWithLevel.Any())
+{
+    foreach (var item in Model.PostsWithLevel)
+    {
+        <li class="list-group-item" style="margin-left:@(item.Level * 2)rem;">
+            <div>
+                <strong>@item.Post?.Author?.UserName</strong>
+                <span class="text-muted small">@item.Post?.CreatedAt.ToString("yyyy-MM-dd HH:mm")</span>
+            </div>
+            <div>@item.Post?.Text</div>
+
+            <!-- Reply button and hidden reply form -->
+            <button type="button" class="btn btn-sm btn-secondary mt-2"
+                    onclick="document.getElementById('reply-form-@item.Post?.Id').style.display='block'; this.style.display='none';">
+                Svara
+            </button>
+            <form id="reply-form-@item.Post?.Id" method="post" asp-page-handler="Reply" asp-route-parentId="@item.Post?.Id"
+                  class="mt-2" style="display:none;">
+                <div class="mb-2">
+                    <textarea name="NewReply.Text" class="form-control" rows="2" placeholder="Svara på detta inlägg..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-sm btn-secondary">Svara</button>
+            </form>
+        </li>
+    }
+}
+else
+{
+    <p>Inga inlägg i detta ämne ännu.</p>
+}
+
+
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
