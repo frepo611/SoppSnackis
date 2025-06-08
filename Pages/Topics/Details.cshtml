@@ -4,6 +4,13 @@
     ViewData["Title"] = Model.Topic?.Name ?? "Ämne";
 }
 
+@if (TempData["StatusMessage"] != null)
+{
+    <div class="alert alert-info">
+        @TempData["StatusMessage"]
+    </div>
+}
+
 <h2>@Model.Topic?.Name</h2>
 <p>Skapad: @Model.Topic?.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd")</p>
 
@@ -19,7 +26,6 @@
 <hr />
 
 @if (Model.PostsWithLevel.Any())
-{
     foreach (var item in Model.PostsWithLevel)
     {
         <li class="list-group-item d-flex" style="margin-left:@(item.Level * 2)rem;">
@@ -57,9 +63,38 @@
                     <button type="submit" class="btn btn-sm btn-secondary">Svara</button>
                 </form>
             </div>
+            <div class="ms-auto d-flex align-items-start">
+                <!-- Report button triggers modal -->
+                <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#reportModal-@item.Post?.Id">
+                    Rapportera
+                </button>
+            </div>
         </li>
+
+        <!-- Report Modal -->
+        <div class="modal fade" id="reportModal-@item.Post?.Id" tabindex="-1" aria-labelledby="reportModalLabel-@item.Post?.Id" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form method="post" asp-page-handler="Report" asp-route-postId="@item.Post?.Id" asp-route-topicId="@Model.Topic.Id">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="reportModalLabel-@item.Post?.Id">Rapportera inlägg</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Stäng"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="reportComment-@item.Post?.Id" class="form-label">Kommentar (valfritt):</label>
+                                <textarea id="reportComment-@item.Post?.Id" name="comment" class="form-control" rows="3" placeholder="Beskriv varför du rapporterar..."></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Avbryt</button>
+                            <button type="submit" class="btn btn-warning">Rapportera</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     }
-}
 else
 {
     <p>Inga inlägg i detta ämne ännu.</p>

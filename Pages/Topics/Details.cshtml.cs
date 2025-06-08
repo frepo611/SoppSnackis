@@ -18,13 +18,10 @@ public class DetailsModel : PageModel
     private readonly SoppSnackisIdentityDbContext _context;
     private readonly UserManager<SoppSnackisUser> _userManager;
 
-    public DetailsModel(SoppSnackisIdentityDbContext context, UserManager<SoppSnackisUser> userManager)
-    {
-        _context = context;
-        _userManager = userManager;
-    }
     public Post NewReply { get; set; } = new();
     public Topic? Topic { get; set; }
+
+    public int TopicId { get; set; }
     public List<Post> Posts { get; set; } = new();
     public List<PostWithLevel> PostsWithLevel { get; set; } = new();
 
@@ -37,6 +34,11 @@ public class DetailsModel : PageModel
     [Display(Name = "Svar")]
     public string NewReplyText { get; set; }
 
+    public DetailsModel(SoppSnackisIdentityDbContext context, UserManager<SoppSnackisUser> userManager)
+    {
+        _context = context;
+        _userManager = userManager;
+    }
     public async Task<IActionResult> OnGetAsync(int id)
     {
         Topic = await _context.Topics
@@ -47,6 +49,8 @@ public class DetailsModel : PageModel
         {
             return NotFound();
         }
+
+        TopicId = Topic.Id;
 
         Posts = await _context.Posts
             .Where(p => p.SubjectId == id)
@@ -139,5 +143,34 @@ public class DetailsModel : PageModel
         NewPostText = string.Empty;
 
         return RedirectToPage(new { id });
+    }
+
+    public async Task<IActionResult> OnPostReportAsync(int postId, int topicId, string? comment)
+    { 
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null) return Challenge();
+
+        // Prevent duplicate reports by the same user for the same post (optional)
+        var alreadyReported = await _context.Reports
+            .AnyAsync(r => r.PostId == postId && r.ReportedByUserId == user.Id && r.Status == "Open");
+        if (alreadyReported)
+        {
+            TempData["StatusMessage"] = "Du har redan rapporterat detta inlägg.";
+            return RedirectToPage(new { id = topicId });
+        }
+
+        var report = new Report
+        {
+            PostId = postId,
+            ReportedByUserId = user.Id,
+            CreatedAt = DateTime.UtcNow,
+            Status = "Open",
+            Comment = comment
+        };
+        _context.Reports.Add(report);
+        await _context.SaveChangesAsync();
+
+        TempData["StatusMessage"] = "Inlägget har rapporterats.";
+        return RedirectToPage(new { id = topicId });
     }
 }
