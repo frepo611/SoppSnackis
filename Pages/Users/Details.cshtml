@@ -10,6 +10,12 @@
 
 <h2>Användarprofil</h2>
 
+@if (TempData["StatusMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["StatusMessage"]
+    </div>
+}
 @if (Model.UserDetails != null)
 {
     <form method="post" enctype="multipart/form-data">
@@ -26,7 +32,7 @@
                 @Model.UserDetails.InfoText
             }
             <br />
-            <strong>Skapad:</strong> @Model.UserDetails.CreatedAt.ToString("yyyy-MM-dd") <br />
+            <strong>Skapad:</strong> @Model.UserDetails.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd") <br />
             @if (!string.IsNullOrEmpty(Model.UserDetails.ProfileImagePath))
             {
                 <img src="@Model.UserDetails.ProfileImagePath" alt="Profilbild" style="max-width:150px;" />

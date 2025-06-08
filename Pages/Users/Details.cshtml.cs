@@ -11,8 +11,7 @@ public class DetailsModel : PageModel
 {
     private readonly UserManager<SoppSnackisUser> _userManager;
 
-    private readonly SoppSnackisIdentityDbContext _context; // Assuming you have a DbContext for your application
-
+    private readonly SoppSnackisIdentityDbContext _context;
     public DetailsModel(UserManager<SoppSnackisUser> userManager, SoppSnackisIdentityDbContext context)
     {
         _userManager = userManager;
