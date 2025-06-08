@@ -5,7 +5,7 @@
 }
 
 <h2>@Model.Topic?.Name</h2>
-<p>Skapad: @Model.Topic?.CreatedAt.ToString("yyyy-MM-dd")</p>
+<p>Skapad: @Model.Topic?.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd")</p>
 
 <h4>Skriv ett nytt inlägg</h4>
 <form method="post">
@@ -40,7 +40,7 @@
                             @item.Post?.Author?.UserName
                         </a>
                     </strong>
-                    <span class="text-muted small">@item.Post?.CreatedAt.ToString("yyyy-MM-dd HH:mm")</span>
+                    <span class="text-muted small">@item.Post?.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</span>
                 </div>
                 <div>@item.Post?.Text</div>
 

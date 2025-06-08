@@ -129,7 +129,7 @@ public class DetailsModel : PageModel
             SubjectId = id,
             AuthorId = user.Id,
             Text = NewPostText,
-            CreatedAt = DateTime.Now
+            CreatedAt = DateTime.UtcNow
         };
 
         _context.Posts.Add(post);
