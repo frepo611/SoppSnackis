@@ -1,5 +1,5 @@
 ﻿@page "{id:guid}"
-@model SoppSnackis.Pages.User.DetailsModel
+@model SoppSnackis.Pages.Users.DetailsModel
 @using Microsoft.AspNetCore.Identity
 @inject UserManager<SoppSnackis.Areas.Identity.Data.SoppSnackisUser> UserManager
 @{
@@ -43,6 +43,24 @@
             </div>
         }
     </form>
+    @if (isOwner && User.Identity.IsAuthenticated)
+    {
+        <div class="mb-3">
+            <a class="btn btn-outline-primary" asp-page="/Messages/Index">Visa mina privata meddelanden</a>
+        </div>
+    }
+    @if (!isOwner && User.Identity.IsAuthenticated)
+    {
+        <hr />
+        <h4>Skicka privat meddelande</h4>
+        <form method="post" asp-page-handler="SendMessage">
+            <div class="mb-2">
+                <textarea asp-for="NewMessageText" class="form-control" rows="3" placeholder="Skriv ditt meddelande..."></textarea>
+                <span asp-validation-for="NewMessageText" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">Skicka</button>
+        </form>
+    }
 }
 else
 {

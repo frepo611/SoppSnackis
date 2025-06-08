@@ -1,0 +1,54 @@
+﻿@page
+@model SoppSnackis.Pages.Messages.IndexModel
+@{
+    ViewData["Title"] = "Privata meddelanden";
+}
+
+<h2>Inkorg</h2>
+@if (Model.ReceivedMessages.Any())
+{
+    <ul class="list-group mb-4">
+        @foreach (var msg in Model.ReceivedMessages)
+        {
+            <li class="list-group-item">
+                <strong>Från:</strong> @msg.Sender?.UserName <br />
+                <span class="text-muted small">@msg.CreatedAt.ToString("yyyy-MM-dd HH:mm")</span>
+                <div>@msg.Text</div>
+                <button type="button" class="btn btn-sm btn-link mt-2"
+                        onclick="document.getElementById('reply-form-@msg.Id').style.display='block'; this.style.display='none';">
+                    Svara
+                </button>
+                <form id="reply-form-@msg.Id" method="post" asp-page-handler="Reply" asp-route-receiverId="@msg.SenderId"
+                      class="mt-2" style="display:none;">
+                    <div class="mb-2">
+                        <textarea name="ReplyText" class="form-control" rows="2" placeholder="Skriv ditt svar..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-primary">Skicka svar</button>
+                </form>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p>Inga mottagna meddelanden.</p>
+}
+
+<h2>Skickade</h2>
+@if (Model.SentMessages.Any())
+{
+    <ul class="list-group">
+        @foreach (var msg in Model.SentMessages)
+        {
+            <li class="list-group-item">
+                <strong>Till:</strong> @msg.Receiver?.UserName <br />
+                <span class="text-muted small">@msg.CreatedAt.ToString("yyyy-MM-dd HH:mm")</span>
+                <div>@msg.Text</div>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p>Inga skickade meddelanden.</p>
+}
