@@ -24,6 +24,9 @@ public class DetailsModel : PageModel
     [Required(ErrorMessage = "Texten får inte vara tom.")]
     public string? EditText { get; set; }
 
+    [BindProperty]
+    public IFormFile? NewImage { get; set; }
+
     public bool CanEdit { get; set; }
     public async Task<IActionResult> OnGetAsync(int id)
     {
@@ -64,6 +67,46 @@ public class DetailsModel : PageModel
         await _context.SaveChangesAsync();
 
         TempData["StatusMessage"] = "Inlägget har uppdaterats.";
+        return RedirectToPage(new { id });
+    }
+
+    public async Task<IActionResult> OnPostChangeImageAsync(int id)
+    {
+        var post = await _context.Posts.FindAsync(id);
+        if (post == null) return NotFound();
+
+        if (NewImage != null && NewImage.Length > 0)
+        {
+            var directory = Path.Combine("wwwroot/images/posts");
+            if (!Directory.Exists(directory))
+                Directory.CreateDirectory(directory);
+
+            var fileName = $"{NanoidDotNet.Nanoid.Generate()}{Path.GetExtension(NewImage.FileName)}";
+            var filePath = Path.Combine(directory, fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await NewImage.CopyToAsync(stream);
+            }
+
+            post.ImagePath = $"/images/posts/{fileName}";
+            await _context.SaveChangesAsync();
+        }
+
+        return RedirectToPage(new { id });
+    }
+
+    public async Task<IActionResult> OnPostDeleteImageAsync(int id)
+    {
+        var post = await _context.Posts.FindAsync(id);
+        if (post == null) return NotFound();
+
+        if (!string.IsNullOrEmpty(post.ImagePath))
+        { 
+            post.ImagePath = null;
+            await _context.SaveChangesAsync();
+        }
+
         return RedirectToPage(new { id });
     }
 }
