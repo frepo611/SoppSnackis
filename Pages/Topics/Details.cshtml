@@ -22,39 +22,45 @@
 {
     foreach (var item in Model.PostsWithLevel)
     {
-        <li class="list-group-item" style="margin-left:@(item.Level * 2)rem;">
-            <div>
-                <strong>
-                    <a asp-page="/Users/Details" asp-route-id="@item.Post?.Author?.Id">
-                        @item.Post?.Author?.UserName
-                    </a>
-                </strong>
-                <span class="text-muted small">@item.Post?.CreatedAt.ToString("yyyy-MM-dd HH:mm")</span>
+        <li class="list-group-item d-flex" style="margin-left:@(item.Level * 2)rem;">
+            <div class="me-3" style="min-width:60px;">
+                @if (!string.IsNullOrEmpty(item.Post?.Author?.ProfileImagePath))
+                {
+                    <img src="@item.Post.Author.ProfileImagePath" alt="Profilbild" style="width:48px; height:48px; object-fit:cover; border-radius:50%;" />
+                }
+                else
+                {
+                    <span class="d-inline-block bg-secondary rounded-circle" style="width:48px; height:48px;"></span>
+                }
             </div>
-            <div>@item.Post?.Text</div>
-
-            <!-- Reply button and hidden reply form -->
-            <button type="button" class="btn btn-sm btn-secondary mt-2"
-                    onclick="document.getElementById('reply-form-@item.Post?.Id').style.display='block'; this.style.display='none';">
-                Svara
-            </button>
-            <form id="reply-form-@item.Post?.Id" method="post" asp-page-handler="Reply" asp-route-parentId="@item.Post?.Id"
-                  class="mt-2" style="display:none;">
-                <div class="mb-2">
-                    <textarea name="NewReplyText" class="form-control" rows="2" placeholder="Svara på detta inlägg..."></textarea>
+            <div class="flex-grow-1">
+                <div>
+                    <strong>
+                        <a asp-page="/Users/Details" asp-route-id="@item.Post?.Author?.Id">
+                            @item.Post?.Author?.UserName
+                        </a>
+                    </strong>
+                    <span class="text-muted small">@item.Post?.CreatedAt.ToString("yyyy-MM-dd HH:mm")</span>
                 </div>
-                <button type="submit" class="btn btn-sm btn-secondary">Svara</button>
-            </form>
+                <div>@item.Post?.Text</div>
+
+                <!-- Reply button and hidden reply form -->
+                <button type="button" class="btn btn-sm btn-secondary mt-2"
+                        onclick="document.getElementById('reply-form-@item.Post?.Id').style.display='block'; this.style.display='none';">
+                    Svara
+                </button>
+                <form id="reply-form-@item.Post?.Id" method="post" asp-page-handler="Reply" asp-route-parentId="@item.Post?.Id"
+                      class="mt-2" style="display:none;">
+                    <div class="mb-2">
+                        <textarea name="NewReplyText" class="form-control" rows="2" placeholder="Svara på detta inlägg..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-secondary">Svara</button>
+                </form>
+            </div>
         </li>
     }
 }
 else
 {
     <p>Inga inlägg i detta ämne ännu.</p>
-}
-
-
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
 }
