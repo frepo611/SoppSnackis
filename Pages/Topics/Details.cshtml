@@ -1,7 +1,9 @@
-@page "{id:int}"
+Ôªø@page "{id:int}"
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<SoppSnackis.Areas.Identity.Data.SoppSnackisUser> UserManager;
 @model DetailsModel
 @{
-    ViewData["Title"] = Model.Topic?.Name ?? "ƒmne";
+    ViewData["Title"] = Model.Topic?.Name ?? "√Ñmne";
 }
 
 @if (TempData["StatusMessage"] != null)
@@ -14,17 +16,17 @@
 <h2>@Model.Topic?.Name</h2>
 <p>Skapad: @Model.Topic?.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd")</p>
 
-<h4>Skriv ett nytt inl‰gg</h4>
+<h4>Skriv ett nytt inl√§gg</h4>
 <form method="post" enctype="multipart/form-data">
     <div class="mb-3">
-        <textarea asp-for="NewPostText" class="form-control" rows="4" placeholder="Skriv ditt inl‰gg h‰r..."></textarea>
+        <textarea asp-for="NewPostText" class="form-control" rows="4" placeholder="Skriv ditt inl√§gg h√§r..."></textarea>
         <span asp-validation-for="NewPostText" class="text-danger"></span>
     </div>
     <div class="mb-3">
         <label for="NewPostImage" class="form-label">Ladda upp bild (valfritt):</label>
         <input type="file" name="NewPostImage" id="NewPostImage" class="form-control" accept="image/*" />
     </div>
-    <button type="submit" class="btn btn-primary">Posta inl‰gg</button>
+    <button type="submit" class="btn btn-primary">Posta inl√§gg</button>
 </form>
 
 <hr />
@@ -56,7 +58,7 @@
                 @if (!string.IsNullOrEmpty(item.Post?.ImagePath))
                 {
                     <div class="mt-2">
-                        <img src="@item.Post.ImagePath" alt="Inl‰ggsbild" style="max-width: 300px; max-height: 300px;" />
+                        <img src="@item.Post.ImagePath" alt="Inl√§ggsbild" style="max-width: 300px; max-height: 300px;" />
                     </div>
                 }
                 </div>
@@ -71,7 +73,7 @@
                 <form id="reply-form-@item.Post?.Id" method="post" asp-page-handler="Reply" asp-route-parentId="@item.Post?.Id"
                       class="mt-2" style="display:none;">
                     <div class="mb-2">
-                        <textarea name="NewReplyText" class="form-control" rows="2" placeholder="Svara pÂ detta inl‰gg..."></textarea>
+                        <textarea name="NewReplyText" class="form-control" rows="2" placeholder="Svara p√• detta inl√§gg..."></textarea>
                     </div>
                     <button type="submit" class="btn btn-sm btn-secondary">Svara</button>
                 </form>
@@ -81,8 +83,22 @@
                 <!-- Report button triggers modal -->
             <div class="ms-auto d-flex align-items-start">
                 <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#reportModal-@item.Post?.Id">
-                    Rapportera
+                    Rapportera  
                 </button>
+                @{
+                  Guid.TryParse(UserManager.GetUserId(User), out Guid authorId);
+                    var isOwner = item.Post?.AuthorId == authorId;
+                    var isAdmin = User.IsInRole("admin");
+                }
+                @if (isOwner || isAdmin)
+                {
+                    <a asp-page="/Posts/Details" asp-route-id="@item.Post?.Id" class="btn btn-sm btn-outline-primary">Redigera</a>
+                }
+                <form method="post" asp-page-handler="Like" asp-route-postId="@item.Post?.Id" asp-route-id="@Model.Topic.Id" class="d-inline">
+                    <button type="submit" class="btn btn-sm btn-outline-primary">
+                        üëç Gilla (@(item.Post?.Likes ?? 0))
+                    </button>
+                </form>
             </div>
         </li>
 
@@ -92,13 +108,13 @@
                 <div class="modal-content">
                     <form method="post" asp-page-handler="Report" asp-route-postId="@item.Post?.Id" asp-route-topicId="@Model.Topic.Id">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="reportModalLabel-@item.Post?.Id">Rapportera inl‰gg</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="St‰ng"></button>
+                            <h5 class="modal-title" id="reportModalLabel-@item.Post?.Id">Rapportera inl√§gg</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="St√§ng"></button>
                         </div>
                         <div class="modal-body">
                             <div class="mb-3">
                                 <label for="reportComment-@item.Post?.Id" class="form-label">Kommentar (valfritt):</label>
-                                <textarea id="reportComment-@item.Post?.Id" name="comment" class="form-control" rows="3" placeholder="Beskriv varfˆr du rapporterar..."></textarea>
+                                <textarea id="reportComment-@item.Post?.Id" name="comment" class="form-control" rows="3" placeholder="Beskriv varf√∂r du rapporterar..."></textarea>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -112,5 +128,5 @@
     }
 else
 {
-    <p>Inga inl‰gg i detta ‰mne ‰nnu.</p>
+    <p>Inga inl√§gg i detta √§mne √§nnu.</p>
 }

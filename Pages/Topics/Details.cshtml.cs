@@ -86,7 +86,17 @@ public class DetailsModel : PageModel
             }
         }
     }
+    public async Task<IActionResult> OnPostLikeAsync(int postId, int topicId)
+    {
+        var post = await _context.Posts.FindAsync(postId);
+        if (post == null)
+            return NotFound();
 
+        post.Likes += 1;
+        await _context.SaveChangesAsync();
+
+        return RedirectToPage(new { topicId });
+    }
     public async Task<IActionResult> OnPostReplyAsync(int parentId)
     {
         ModelState.Remove(nameof(NewPostText)); // Ignore new post validation

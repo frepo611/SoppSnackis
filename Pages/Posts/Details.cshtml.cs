@@ -46,6 +46,22 @@ public class DetailsModel : PageModel
         return Page();
     }
 
+    public async Task<IActionResult> OnPostSetLikesAsync(int id, int newLikes)
+    {
+        var post = await _context.Posts.FindAsync(id);
+        if (post == null)
+            return NotFound();
+
+        if (!User.IsInRole("admin"))
+            return Forbid();
+
+        post.Likes = newLikes;
+        await _context.SaveChangesAsync();
+
+        TempData["StatusMessage"] = "Antal likes har uppdaterats.";
+        return RedirectToPage(new { id });
+    }
+
     public async Task<IActionResult> OnPostEditAsync(int id)
     {
         Post = await _context.Posts.FindAsync(id);
@@ -102,7 +118,7 @@ public class DetailsModel : PageModel
         if (post == null) return NotFound();
 
         if (!string.IsNullOrEmpty(post.ImagePath))
-        { 
+        {
             post.ImagePath = null;
             await _context.SaveChangesAsync();
         }

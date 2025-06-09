@@ -3,7 +3,16 @@
 @{
     ViewData["Title"] = "Inläggsdetaljer";
 }
-
+@if (TempData["StatusMessage"] != null)
+{
+    <div class="alert alert-info">@TempData["StatusMessage"]</div>
+}
+@if (Model.Post != null)
+{
+    <a asp-page="/Topics/Details" asp-route-id="@Model.Post.SubjectId" class="btn btn-secondary mb-3">
+        Tillbaka till ämnet
+    </a>
+}
 @if (Model.Post == null)
 {
     <div class="alert alert-danger">Inlägget hittades inte.</div>
@@ -28,18 +37,33 @@ else
                     <img src="@Model.Post.ImagePath" alt="Inläggsbild" style="max-width: 300px; max-height: 300px;" />
                 </div>
             }
+            <div>
+                <span class="text-primary">
+                    👍 Gilla: @Model.Post.Likes
+                </span>
+            </div>
+            @if (User.IsInRole("admin"))
+            {
+                <form method="post" asp-page-handler="SetLikes" asp-route-id="@Model.Post.Id" class="mt-2 d-flex align-items-center">
+                    <input type="number" name="newLikes" class="form-control form-control-sm me-2" value="@Model.Post.Likes" min="0" style="width:100px;" />
+                    <button type="submit" class="btn btn-sm btn-warning">Sätt likes</button>
+                </form>
+            }
             @if (Model.CanEdit)
             {
                 <form method="post" enctype="multipart/form-data" asp-page-handler="ChangeImage" asp-route-id="@Model.Post.Id" class="mb-3">
                     <div class="mb-2">
-                        <label for="NewImage" class="form-label">Byt bild:</label>
+                        <label for="NewImage" class="form-label">Byt eller lägg till bild:</label>
                         <input type="file" name="NewImage" id="NewImage" class="form-control" accept="image/*" />
                     </div>
                     <button type="submit" class="btn btn-secondary btn-sm">Ladda upp ny bild</button>
                 </form>
+                @if (!string.IsNullOrEmpty(Model.Post.ImagePath))
+                {
                 <form method="post" asp-page-handler="DeleteImage" asp-route-id="@Model.Post.Id" style="display:inline;">
                     <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Ta bort bilden?');">Ta bort bild</button>
                 </form>
+                }
                 <form method="post" asp-page-handler="Edit" asp-route-id="@Model.Post.Id">
                     <div class="mb-2">
                         <textarea class="form-control" asp-for="EditText" rows="3"></textarea>
