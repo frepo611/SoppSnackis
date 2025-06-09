@@ -1,0 +1,33 @@
+﻿@page
+@model SoppSnackis.Pages.Groups.IndexModel
+@{
+    ViewData["Title"] = "Mina grupper";
+}
+
+@if (TempData["StatusMessage"] != null)
+{
+    <div class="alert alert-info">
+        @TempData["StatusMessage"]
+    </div>
+}
+
+<h2>Mina grupper</h2>
+@if (Model.MyGroupMemberships.Any())
+{
+    <ul class="list-group">
+        @foreach (var membership in Model.MyGroupMemberships)
+        {
+            <li class="list-group-item d-flex align-items-center">
+                <a asp-page="Details" asp-route-id="@membership.GroupId">@membership.Group?.Name</a>
+                @if (membership.IsOwner)
+                {
+                    <span class="badge bg-success ms-2">Ägare</span>
+                }
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p>Du är inte medlem i några grupper.</p>
+}
