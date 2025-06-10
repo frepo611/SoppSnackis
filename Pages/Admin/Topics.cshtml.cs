@@ -39,6 +39,9 @@ public class TopicsModel : PageModel
 
     public async Task<IActionResult> OnPostCreateAsync()
     {
+        // Remove CreatedByUserName from ModelState before validation
+        ModelState.Remove("NewTopic.CreatedByUserName");
+
         if (!ModelState.IsValid)
         {
             await OnGetAsync();

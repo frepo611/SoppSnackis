@@ -17,6 +17,8 @@ public class SoppSnackisIdentityDbContext : IdentityDbContext<SoppSnackisUser, I
     public DbSet<PrivateMessage> PrivateMessages { get; set; } = default!;
     public DbSet<Report> Reports { get; set; } = default!;
     public DbSet<Topic> Topics { get; set; } = default!;
+    public DbSet<PostLike> PostLikes { get; set; }
+    public DbSet<ForbiddenWord> ForbiddenWords { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder builder)
@@ -62,6 +64,12 @@ public class SoppSnackisIdentityDbContext : IdentityDbContext<SoppSnackisUser, I
             .HasForeignKey(p => p.SubjectId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        builder.Entity<PostLike>()
+            .HasOne(pl => pl.Post)
+            .WithMany()
+            .HasForeignKey(pl => pl.PostId)
+            .OnDelete(DeleteBehavior.Restrict); // Prevents cascade path error
+
         // PrivateMessage: Sender, Receiver, Group
         builder.Entity<PrivateMessage>()
             .HasOne(pm => pm.Sender)
@@ -100,6 +108,8 @@ public class SoppSnackisIdentityDbContext : IdentityDbContext<SoppSnackisUser, I
             .WithMany()
             .HasForeignKey(t => t.CreatedByUserId)
             .OnDelete(DeleteBehavior.Cascade);
+
     }
+
 }
 

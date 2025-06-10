@@ -9,6 +9,10 @@ public class TopicDTO
     /// Gets or sets the unique identifier of the user who created the topic.
     /// </summary>
     public Guid CreatedByUserId { get; set; }
+    /// <summary>
+    /// Gets or sets the name of the user who created the topic.
+    /// </summary>
+    public string CreatedByUserName { get; set; }
 
     /// <summary>
     /// Gets or sets the date and time when the topic was created.

@@ -1,12 +1,13 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using SoppSnackis.Models;
-using SoppSnackis.Areas.Identity.Data;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using System.ComponentModel.DataAnnotations;
 using NanoidDotNet;
+using SoppSnackis.Areas.Identity.Data;
+using SoppSnackis.Models;
+using SoppSnackis.Utilities;
+using System.ComponentModel.DataAnnotations;
 
 [Authorize(Roles = "user")]
 public class DetailsModel : PageModel
@@ -18,6 +19,8 @@ public class DetailsModel : PageModel
     }
     private readonly SoppSnackisIdentityDbContext _context;
     private readonly UserManager<SoppSnackisUser> _userManager;
+    private readonly WordFilter _wordFilter;
+
 
     public Post NewReply { get; set; } = new();
     public Topic? Topic { get; set; }
@@ -38,13 +41,19 @@ public class DetailsModel : PageModel
     [BindProperty]
     public IFormFile NewPostImage { get; set; }
 
-    public DetailsModel(SoppSnackisIdentityDbContext context, UserManager<SoppSnackisUser> userManager)
+    public DetailsModel(SoppSnackisIdentityDbContext context, UserManager<SoppSnackisUser> userManager, WordFilter wordFilter)
     {
         _context = context;
         _userManager = userManager;
+        _wordFilter = wordFilter;
     }
     public async Task<IActionResult> OnGetAsync(int id)
     {
+        if (id <= 0)
+        {
+            return NotFound();
+        }
+
         Topic = await _context.Topics
             .Include(t => t.Posts)
             .FirstOrDefaultAsync(t => t.Id == id);
@@ -92,10 +101,32 @@ public class DetailsModel : PageModel
         if (post == null)
             return NotFound();
 
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+            return Forbid();
+
+        // Check if the user has already liked this post
+        bool alreadyLiked = await _context.PostLikes
+            .AnyAsync(pl => pl.PostId == postId && pl.UserId == user.Id);
+
+        if (alreadyLiked)
+        {
+            TempData["StatusMessage"] = "Du har redan gillat detta inlägg.";
+            return RedirectToPage(new { id = topicId });
+        }
+
+        // Add like record
+        var postLike = new PostLike
+        {
+            PostId = postId,
+            UserId = user.Id
+        };
+        _context.PostLikes.Add(postLike);
+
         post.Likes += 1;
         await _context.SaveChangesAsync();
 
-        return RedirectToPage(new { topicId });
+        return RedirectToPage(new { id = topicId });
     }
     public async Task<IActionResult> OnPostReplyAsync(int parentId)
     {
@@ -113,9 +144,13 @@ public class DetailsModel : PageModel
 
         var user = await _userManager.GetUserAsync(User);
 
+        var filterResult = await _wordFilter.FilterForbiddenWordsAsync(NewReplyText);
+        var filteredText = filterResult.filteredText;
+        var hadForbidden = filterResult.hadForbidden;
+
         var reply = new Post
         {
-            Text = NewReplyText,
+            Text = filteredText,
             AuthorId = user.Id,
             CreatedAt = DateTime.UtcNow,
             ParentPostId = parentId,
@@ -124,6 +159,9 @@ public class DetailsModel : PageModel
 
         _context.Posts.Add(reply);
         await _context.SaveChangesAsync();
+
+        if (hadForbidden)
+            TempData["StatusMessage"] = "Vissa ord i ditt inlägg var otillåtna och har ersatts med ***.";
 
         return RedirectToPage(new { id = parentPost.SubjectId });
     }
@@ -162,17 +200,25 @@ public class DetailsModel : PageModel
             imagePath = $"/images/posts/{fileName}";
         }
 
+        var filterResult = await _wordFilter.FilterForbiddenWordsAsync(NewPostText);
+        var filteredText = filterResult.filteredText;
+        var hadForbidden = filterResult.hadForbidden;
+
+
         var post = new Post
         {
             SubjectId = id,
             AuthorId = user.Id,
-            Text = NewPostText,
+            Text = filteredText,
             CreatedAt = DateTime.UtcNow,
             ImagePath = imagePath
         };
 
         _context.Posts.Add(post);
         await _context.SaveChangesAsync();
+
+        if (hadForbidden)
+            TempData["StatusMessage"] = "Vissa ord i ditt inlägg var otillåtna och har ersatts med ***.";
 
         // Clear the form after submission
         NewPostText = string.Empty;

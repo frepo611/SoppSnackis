@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SoppSnackis.Areas.Identity.Data;
 
@@ -11,9 +12,11 @@ using SoppSnackis.Areas.Identity.Data;
 namespace SoppSnackis.Migrations
 {
     [DbContext(typeof(SoppSnackisIdentityDbContext))]
-    partial class SoppSnackisIdentityDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250610070533_AddToDbContext")]
+    partial class AddToDbContext
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -232,29 +235,6 @@ namespace SoppSnackis.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("SoppSnackis.Models.ForbiddenWord", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<Guid>("CreatedByUserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Word")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedByUserId");
-
-                    b.ToTable("ForbiddenWords");
-                });
-
             modelBuilder.Entity("SoppSnackis.Models.Group", b =>
                 {
                     b.Property<int>("Id")
@@ -349,32 +329,6 @@ namespace SoppSnackis.Migrations
                     b.HasIndex("SubjectId");
 
                     b.ToTable("Posts");
-                });
-
-            modelBuilder.Entity("SoppSnackis.Models.PostLike", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("PostId")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PostId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("PostLikes");
                 });
 
             modelBuilder.Entity("SoppSnackis.Models.PrivateMessage", b =>
@@ -525,17 +479,6 @@ namespace SoppSnackis.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("SoppSnackis.Models.ForbiddenWord", b =>
-                {
-                    b.HasOne("SoppSnackis.Areas.Identity.Data.SoppSnackisUser", "CreatedByUser")
-                        .WithMany()
-                        .HasForeignKey("CreatedByUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CreatedByUser");
-                });
-
             modelBuilder.Entity("SoppSnackis.Models.Group", b =>
                 {
                     b.HasOne("SoppSnackis.Areas.Identity.Data.SoppSnackisUser", "CreatedByUser")
@@ -590,25 +533,6 @@ namespace SoppSnackis.Migrations
                     b.Navigation("ParentPost");
 
                     b.Navigation("Subject");
-                });
-
-            modelBuilder.Entity("SoppSnackis.Models.PostLike", b =>
-                {
-                    b.HasOne("SoppSnackis.Models.Post", "Post")
-                        .WithMany()
-                        .HasForeignKey("PostId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("SoppSnackis.Areas.Identity.Data.SoppSnackisUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Post");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("SoppSnackis.Models.PrivateMessage", b =>

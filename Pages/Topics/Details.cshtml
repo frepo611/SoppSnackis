@@ -94,7 +94,7 @@
                 {
                     <a asp-page="/Posts/Details" asp-route-id="@item.Post?.Id" class="btn btn-sm btn-outline-primary">Redigera</a>
                 }
-                <form method="post" asp-page-handler="Like" asp-route-postId="@item.Post?.Id" asp-route-id="@Model.Topic.Id" class="d-inline">
+                <form method="post" asp-page-handler="Like" asp-route-postId="@item.Post?.Id" asp-route-topicId="@Model.Topic.Id" class="d-inline">
                     <button type="submit" class="btn btn-sm btn-outline-primary">
                         👍 Gilla (@(item.Post?.Likes ?? 0))
                     </button>

@@ -26,7 +26,8 @@
             {
                 <tr>
                     <td>@topic.Name</td>
-                    <td>@topic.CreatedByUserId</td>
+                    <td>@topic.CreatedByUserName
+                    </td>
                     <td>@topic.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd")</td>
                     <td>
                         <form method="post" asp-page-handler="Delete" asp-route-id="@topic.Id" style="display:inline">

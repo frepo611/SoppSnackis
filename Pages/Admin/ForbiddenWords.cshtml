@@ -1,0 +1,53 @@
+﻿@page
+@model SoppSnackis.Pages.ForbiddenWords.IndexModel
+@{
+    ViewData["Title"] = "Förbjudna ord";
+}
+
+<h1>Förbjudna ord</h1>
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="alert alert-danger">@Model.ErrorMessage</div>
+}
+
+<!-- Add new forbidden word form -->
+<form method="post" asp-page-handler="Add" class="mb-3">
+    <div class="input-group">
+        <input asp-for="NewWord" class="form-control" placeholder="Nytt förbjudet ord" />
+        <button type="submit" class="btn btn-success">Lägg till</button>
+    </div>
+</form>
+
+@if (Model.ForbiddenWords != null && Model.ForbiddenWords.Count > 0)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Ord</th>
+                <th>Åtgärder</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var word in Model.ForbiddenWords)
+        {
+            <tr>
+                <td>@word.Word</td>
+                <td>
+                    <form method="post" asp-page-handler="Delete" asp-route-id="@word.Id" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm">Ta bort</button>
+                    </form>
+                    <form method="post" asp-page-handler="Edit" asp-route-id="@word.Id" style="display:inline;">
+                        <input type="text" name="EditWord" value="@word.Word" class="form-control d-inline-block" style="width:120px;" />
+                        <button type="submit" class="btn btn-primary btn-sm">Uppdatera</button>
+                    </form>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Inga förbjudna ord hittades.</p>
+}

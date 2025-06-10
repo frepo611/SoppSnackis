@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SoppSnackis.Areas.Identity.Data;
 using Microsoft.AspNetCore.Identity;
+using SoppSnackis.Utilities;
 
 namespace SoppSnackis;
 
@@ -15,7 +16,7 @@ public class Program
 
         // Register your DbContext with the DI container
         builder.Services.AddDbContext<SoppSnackisIdentityDbContext>(options =>
-            options.UseSqlServer(builder.Configuration.GetConnectionString("LocalConnection")));
+            options.UseSqlServer(builder.Configuration.GetConnectionString("AzureConnection")));
 
         builder.Services.AddDefaultIdentity<SoppSnackisUser>(options => options.SignIn.RequireConfirmedAccount = true)
             .AddRoles<IdentityRole<Guid>>()
@@ -24,11 +25,14 @@ public class Program
         // Add this to register an HttpClient for your API
         builder.Services.AddHttpClient("SoppSnackisAPI", client =>
         {   
-            var baseAddress = builder.Configuration.GetValue<string>("SoppSnackisAPI:BaseAddress");
+            var baseAddress = builder.Configuration.GetValue<string>("SoppSnackisAzureAPI:BaseAddress");
             client.BaseAddress = new Uri(baseAddress!);
         });
 
         builder.Services.AddScoped<Services.IApiService, Services.ApiService>();
+
+        // Register WordFilter as a scoped service
+        builder.Services.AddScoped<WordFilter>();
 
         var app = builder.Build();
 
