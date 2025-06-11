@@ -1,5 +1,7 @@
 ﻿@page
 @model SoppSnackis.Pages.Groups.IndexModel
+@using Microsoft.AspNetCore.Authorization
+@inject Microsoft.AspNetCore.Authorization.IAuthorizationService AuthorizationService
 @{
     ViewData["Title"] = "Mina grupper";
 }
@@ -12,6 +14,14 @@
 }
 
 <h2>Mina grupper</h2>
+
+@if (User.Identity.IsAuthenticated)
+{
+    <div class="mb-3">
+        <a class="btn btn-success" asp-page="Create">Skapa ny grupp</a>
+    </div>
+}
+
 @if (Model.MyGroupMemberships.Any())
 {
     <ul class="list-group">

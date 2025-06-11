@@ -4,9 +4,10 @@ using Microsoft.AspNetCore.Identity;
 using SoppSnackis.Models;
 using SoppSnackis.Areas.Identity.Data;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SoppSnackis.Pages.Groups;
-
+[Authorize]
 public class CreateModel : PageModel
 {
     private readonly SoppSnackisIdentityDbContext _context;
