@@ -105,7 +105,6 @@ public class DetailsModel : PageModel
         if (user == null)
             return Forbid();
 
-        // Check if the user has already liked this post
         bool alreadyLiked = await _context.PostLikes
             .AnyAsync(pl => pl.PostId == postId && pl.UserId == user.Id);
 
@@ -115,7 +114,6 @@ public class DetailsModel : PageModel
             return RedirectToPage(new { id = topicId });
         }
 
-        // Add like record
         var postLike = new PostLike
         {
             PostId = postId,
@@ -134,7 +132,7 @@ public class DetailsModel : PageModel
         ModelState.Remove(nameof(NewPostImage)); // Ignore new image validation
         if (!ModelState.IsValid)
         {
-            await OnGetAsync(parentId); // or topic id
+            await OnGetAsync(parentId);
             return Page();
         }
 
@@ -231,7 +229,6 @@ public class DetailsModel : PageModel
         var user = await _userManager.GetUserAsync(User);
         if (user == null) return Challenge();
 
-        // Prevent duplicate reports by the same user for the same post (optional)
         var alreadyReported = await _context.Reports
             .AnyAsync(r => r.PostId == postId && r.ReportedByUserId == user.Id && r.Status == "Open");
         if (alreadyReported)

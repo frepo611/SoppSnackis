@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using SoppSnackis.Models;
 using SoppSnackis.Services;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace SoppSnackis.Pages.ForbiddenWords
 {

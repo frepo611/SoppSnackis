@@ -55,7 +55,6 @@ public class IndexModel : PageModel
         _context.PrivateMessages.Add(message);
         await _context.SaveChangesAsync();
 
-        // Optionally clear the reply text
         ReplyText = string.Empty;
 
         return RedirectToPage();

@@ -52,8 +52,6 @@ public class ApiService : IApiService
         return topics;
     }
 
-    // --- Forbidden Words API Methods ---
-
     public async Task<List<ForbiddenWord>> GetForbiddenWordsAsync()
     {
         var client = _httpClientFactory.CreateClient("SoppSnackisAPI");
