@@ -1,4 +1,4 @@
-# SoppSnackis – Diskussionsforum
+# SoppSnackis â€“ Diskussionsforum
 
 SoppSnackis is a modern discussion forum built with Razor Pages (.NET 8), featuring a Swedish user interface and an English REST API. The project is designed for flexibility, security, and extensibility, supporting both basic and advanced forum features.
 
@@ -7,7 +7,7 @@ SoppSnackis is a modern discussion forum built with Razor Pages (.NET 8), featur
 ## Features
 
 ### Forum & User Features
-- **Public Subjects:** Browse and participate in various discussion subjects (e.g., Bilsnack, Båtsnack, Cykelsnack).
+- **Public Subjects:** Browse and participate in various discussion subjects (e.g., Bilsnack, BÃ¥tsnack, Cykelsnack).
 - **Threaded Posts:** Create posts and comment in a true tree structure, supporting parallel replies at any level.
 - **User Registration & Login:** Anyone can register and participate.
 - **Profile Pages:** Each user has a simple info page and can upload a profile picture.
@@ -16,7 +16,6 @@ SoppSnackis is a modern discussion forum built with Razor Pages (.NET 8), featur
 - **Profanity Filter:** Inappropriate words are automatically censored.
 - **Private Messaging:** Send private messages to other users.
 - **Group Messaging:** Create groups, invite users, and send group messages (VG).
-- **Quoting:** Quote previous posts in replies.
 - **Reporting:** Report inappropriate posts for admin review.
 
 ### Admin Features
@@ -37,28 +36,9 @@ SoppSnackis is a modern discussion forum built with Razor Pages (.NET 8), featur
 - **File Storage:** Images are stored in the file system, with paths saved in the database.
 - **Validation:** Client-side validation with jQuery Validation (MIT License).
 - **Architecture:** Separation of concerns between UI, API, and data access.
-- **Extensible:** Designed for easy addition of new features (e.g., notifications, real-time updates).
 
 ---
 
-## Getting Started
 
-1. **Clone the repository**
-2. **Configure the connection string** in `appsettings.json`
-3. **Run EF Core migrations**
-4. **Start the application**
-5. **Access the forum** at `https://localhost:xxxx/`
-
----
-
-## License
-
-This project uses open source components (e.g., jQuery Validation under MIT License). See individual library folders for details.
-
----
-
-## Contributing
-
-Pull requests and suggestions are welcome! Please open an issue to discuss your ideas.
 
       
