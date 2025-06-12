@@ -36,7 +36,10 @@ public class Program
 
         var app = builder.Build();
 
-        // Seed the Identity database with a default user and admin role
+        // Seed the Identity database with a default user and admin role.
+        // Disable this in production or ensure it runs only once. It throw an exception during starup if not paused.
+
+        /*
         using (var scope = app.Services.CreateScope())
         {
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<SoppSnackisUser>>();
@@ -55,6 +58,7 @@ public class Program
                 await roleManager.CreateAsync(new IdentityRole<Guid>(userRoleName));
             }
       }
+        */
 
         // Configure the HTTP request pipeline.
         if (!app.Environment.IsDevelopment())
